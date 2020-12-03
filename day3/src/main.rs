@@ -45,8 +45,7 @@ fn run() -> Result<(), io::Error> {
     let input_file = File::open(path)?;
     let lines = BufReader::new(input_file)
         .lines()
-        .filter_map(Result::ok)
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, _>>()?;
 
     part1(lines.iter());
     part2(&lines);
