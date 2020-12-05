@@ -40,7 +40,8 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> 
 fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
     let mut ids = lines.map(calculate_id).collect::<Vec<_>>();
     ids.sort();
-    let pair = ids.windows(2)
+    let pair = ids
+        .windows(2)
         .filter(|&pair| pair[1] - pair[0] == 2)
         .next()
         .ok_or(Day5Error::NotFound)?;
