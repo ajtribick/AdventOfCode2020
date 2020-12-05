@@ -7,12 +7,14 @@ use std::path::PathBuf;
 #[derive(Debug)]
 enum Day5Error {
     NoData,
+    NotFound,
 }
 
 impl fmt::Display for Day5Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Day5Error::NoData => write!(f, "No data"),
+            Day5Error::NotFound => write!(f, "Result not found"),
         }
     }
 }
@@ -35,12 +37,15 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> 
     Ok(())
 }
 
-fn part2(lines: impl Iterator<Item = impl AsRef<str>>) {
-    let mut ids = lines.map(calculate_id).collect::<Vec<i32>>();
+fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
+    let mut ids = lines.map(calculate_id).collect::<Vec<_>>();
     ids.sort();
-    ids.windows(2)
+    let pair = ids.windows(2)
         .filter(|&pair| pair[1] - pair[0] == 2)
-        .for_each(|pair| println!("Part 2, found empty seat at {}", pair[0] + 1));
+        .next()
+        .ok_or(Day5Error::NotFound)?;
+    println!("Part 2, found empty seat at {}", pair[0] + 1);
+    Ok(())
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
@@ -55,7 +60,7 @@ fn run() -> Result<(), Box<dyn Error>> {
         .lines()
         .collect::<Result<Vec<_>, _>>()?;
     part1(lines.iter())?;
-    part2(lines.iter());
+    part2(lines.iter())?;
     Ok(())
 }
 
