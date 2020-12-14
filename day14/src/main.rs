@@ -1,19 +1,31 @@
 use std::{
     error::Error,
-    fs::read_to_string,
+    fs::File,
+    io::{BufRead, BufReader},
     path::PathBuf,
 };
 
-mod error;
+mod common;
 mod part1;
-
-use part1::part1;
+mod part2;
 
 fn run() -> Result<(), Box<dyn Error>> {
     let path = ["data", "day14", "input.txt"].iter().collect::<PathBuf>();
-    let code = read_to_string(path)?;
+    let file = File::open(path)?;
+    let program = BufReader::new(file)
+        .lines()
+        .map(|line_err| {
+            line_err
+                .map_err(Box::<dyn Error>::from)
+                .and_then(|line| line.parse().map_err(Box::<dyn Error>::from))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
-    part1(&code)?;
+    let result1 = part1::execute_program(program.iter());
+    println!("Part 1: result = {}", result1);
+
+    let result2 = part2::execute_program(program.iter());
+    println!("Part 2: result = {}", result2);
 
     Ok(())
 }
