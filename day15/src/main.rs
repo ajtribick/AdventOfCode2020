@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use ahash::AHashMap;
 
 fn elf_sequence(initial: &[usize], n: usize) -> usize {
     assert!(!initial.is_empty());
@@ -6,7 +6,7 @@ fn elf_sequence(initial: &[usize], n: usize) -> usize {
         .iter()
         .enumerate()
         .map(|(i, x)| (*x, i + 1))
-        .collect::<HashMap<_, _>>();
+        .collect::<AHashMap<_, _>>();
     let mut item = *initial.last().unwrap();
     for pos in initial.len()..n {
         let mut next_item = 0;
@@ -26,19 +26,9 @@ fn elf_sequence(initial: &[usize], n: usize) -> usize {
 
 const INPUT: [usize; 6] = [1, 0, 16, 5, 17, 4];
 
-#[cfg(debug_assertions)]
-fn part2() {
-    eprintln!("Skipping part 2 on debug build")
-}
-
-#[cfg(not(debug_assertions))]
-fn part2() {
-    println!("Part 2: result = {}", elf_sequence(&INPUT, 30000000))
-}
-
 fn main() {
     println!("Part 1: result = {}", elf_sequence(&INPUT, 2020));
-    part2();
+    println!("Part 2: result = {}", elf_sequence(&INPUT, 30000000));
 }
 
 #[cfg(test)]
