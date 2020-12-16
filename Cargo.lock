@@ -114,6 +114,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "day16"
+version = "0.1.0"
+dependencies = [
+ "bitvec",
+]
+
+[[package]]
 name = "derivative"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
