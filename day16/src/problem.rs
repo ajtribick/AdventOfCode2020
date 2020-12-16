@@ -1,6 +1,6 @@
-use std::{error::Error, fmt, iter, ops::RangeInclusive};
-
 use bitvec::prelude::*;
+use regex::Regex;
+use std::{error::Error, fmt, iter, ops::RangeInclusive, str::FromStr};
 
 #[derive(Debug)]
 pub struct ParseError(&'static str);
@@ -30,6 +30,30 @@ impl FieldInfo {
     }
 }
 
+impl FromStr for FieldInfo {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        lazy_static! {
+            static ref RE: Regex =
+                Regex::new(r"^([^:]+): ([0-9]+)-([0-9]+) or ([0-9]+)-([0-9]+)$").unwrap();
+        }
+
+        let captures = RE.captures(s).ok_or(ParseError("Not a field"))?;
+        let name = captures[1].to_owned();
+        let start1 = captures[2].parse().map_err(|_| ParseError("Bad range"))?;
+        let end1 = captures[3].parse().map_err(|_| ParseError("Bad range"))?;
+        let start2 = captures[4].parse().map_err(|_| ParseError("Bad range"))?;
+        let end2 = captures[5].parse().map_err(|_| ParseError("Bad range"))?;
+
+        Ok(Self {
+            name,
+            range1: start1..=end1,
+            range2: start2..=end2,
+        })
+    }
+}
+
 #[derive(Debug)]
 pub struct Problem {
     fields: Vec<FieldInfo>,
@@ -45,34 +69,16 @@ fn parse_fields(
     let mut allowed = bitvec![0; 1000];
 
     while let Some(line_ref) = lines.next() {
-        let line = line_ref.as_ref();
+        let line: &str = line_ref.as_ref();
         if line.is_empty() {
             break;
         }
-        let name_end = line
-            .find(": ")
-            .ok_or(ParseError("Missing field definition"))?;
-        let name = line[..name_end].to_owned();
-        let range_elements = line[name_end + 2..]
-            .split(|c: char| !c.is_digit(10))
-            .filter_map(|s| s.parse::<usize>().ok())
-            .collect::<Vec<_>>();
 
-        if range_elements.len() != 4 {
-            return Err(ParseError("Bad range"));
-        }
+        let field = line.parse::<FieldInfo>()?;
+        allowed[field.range1.clone()].set_all(true);
+        allowed[field.range2.clone()].set_all(true);
 
-        let range1 = range_elements[0]..=range_elements[1];
-        let range2 = range_elements[2]..=range_elements[3];
-
-        allowed[range1.clone()].set_all(true);
-        allowed[range2.clone()].set_all(true);
-
-        fields.push(FieldInfo {
-            name,
-            range1,
-            range2,
-        });
+        fields.push(field);
     }
 
     Ok((fields, allowed))

@@ -5,6 +5,9 @@ use std::{
     path::PathBuf,
 };
 
+#[macro_use]
+extern crate lazy_static;
+
 mod problem;
 
 use problem::Problem;
