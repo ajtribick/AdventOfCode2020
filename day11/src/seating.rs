@@ -286,8 +286,6 @@ impl FromStr for SeatingPlan {
 mod test {
     use super::SeatingPlan;
 
-    use std::error::Error;
-
     const EXAMPLES_PART1: [&str; 6] = [
         r"L.LL.LL.LL
 LLLLLLL.LL
@@ -425,71 +423,69 @@ LLL###LLL#
     ];
 
     #[test]
-    fn test_string_roundtrip() -> Result<(), Box<dyn Error>> {
+    fn test_string_roundtrip() {
         for &layout in EXAMPLES_PART1.iter() {
-            let plan = layout.parse::<SeatingPlan>()?;
+            let plan = layout.parse::<SeatingPlan>().unwrap();
             let result = plan.to_string();
             assert_eq!(result, layout);
         }
-
-        Ok(())
     }
 
     #[test]
-    fn test_update() -> Result<(), Box<dyn Error>> {
-        let mut plan = EXAMPLES_PART1[0].parse::<SeatingPlan>()?;
+    fn test_update() {
+        let mut plan = EXAMPLES_PART1[0].parse::<SeatingPlan>().unwrap();
         for &expected in EXAMPLES_PART1[1..].iter() {
             let was_updated = plan.update();
             assert!(was_updated);
             assert_eq!(plan.to_string(), expected);
         }
-
-        Ok(())
     }
 
     #[test]
-    fn test_no_update() -> Result<(), Box<dyn Error>> {
+    fn test_no_update() {
         let expected = *EXAMPLES_PART1.last().unwrap();
-        let mut plan = expected.parse::<SeatingPlan>()?;
+        let mut plan = expected.parse::<SeatingPlan>().unwrap();
         let was_updated = plan.update();
         assert!(!was_updated);
         assert_eq!(plan.to_string(), expected);
-        Ok(())
     }
 
     #[test]
-    fn test_occupied() -> Result<(), Box<dyn Error>> {
-        let plan = EXAMPLES_PART1.last().unwrap().parse::<SeatingPlan>()?;
+    fn test_occupied() {
+        let plan = EXAMPLES_PART1
+            .last()
+            .unwrap()
+            .parse::<SeatingPlan>()
+            .unwrap();
         assert_eq!(plan.occupied(), 37);
-        Ok(())
     }
 
     #[test]
-    fn test_update2() -> Result<(), Box<dyn Error>> {
-        let mut plan = EXAMPLES_PART2[0].parse::<SeatingPlan>()?;
+    fn test_update2() {
+        let mut plan = EXAMPLES_PART2[0].parse::<SeatingPlan>().unwrap();
         for &expected in EXAMPLES_PART2[1..].iter() {
             let was_updated = plan.update2();
             assert!(was_updated);
             assert_eq!(plan.to_string(), expected);
         }
-
-        Ok(())
     }
 
     #[test]
-    fn test_no_update2() -> Result<(), Box<dyn Error>> {
+    fn test_no_update2() {
         let expected = *EXAMPLES_PART2.last().unwrap();
-        let mut plan = expected.parse::<SeatingPlan>()?;
+        let mut plan = expected.parse::<SeatingPlan>().unwrap();
         let was_updated = plan.update2();
         assert!(!was_updated);
         assert_eq!(plan.to_string(), expected);
-        Ok(())
     }
 
     #[test]
-    fn test_occupied2() -> Result<(), Box<dyn Error>> {
-        let plan = EXAMPLES_PART2.last().unwrap().parse::<SeatingPlan>()?;
+    fn test_occupied2() {
+        let plan = EXAMPLES_PART2
+            .last()
+            .unwrap()
+            .parse::<SeatingPlan>()
+            .unwrap();
         assert_eq!(plan.occupied(), 26);
-        Ok(())
     }
 }

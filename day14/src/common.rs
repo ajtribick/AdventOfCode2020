@@ -59,8 +59,6 @@ impl FromStr for Instruction {
 mod test {
     use super::Instruction;
 
-    use std::error::Error;
-
     const EXAMPLE_TEXT: &str = r"mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
 mem[8] = 11
 mem[7] = 101
@@ -74,12 +72,11 @@ mem[8] = 0";
     ];
 
     #[test]
-    fn parse_test() -> Result<(), Box<dyn Error>> {
+    fn parse_test() {
         let program = EXAMPLE_TEXT
             .lines()
-            .map(|l| l.parse::<Instruction>())
-            .collect::<Result<Vec<_>, _>>()?;
-        assert!(program.iter().eq(EXAMPLE_PROGRAM.iter()));
-        Ok(())
+            .map(|l| l.parse::<Instruction>().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(program, EXAMPLE_PROGRAM);
     }
 }

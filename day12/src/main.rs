@@ -191,8 +191,9 @@ F11";
     fn parse_test() {
         let result = EXAMPLE1_TEXT
             .lines()
-            .map(|l| l.parse::<Instruction>().unwrap());
-        assert!(result.eq(EXAMPLE1.iter().copied()));
+            .map(|l| l.parse::<Instruction>().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(result, EXAMPLE1);
     }
 
     #[test]

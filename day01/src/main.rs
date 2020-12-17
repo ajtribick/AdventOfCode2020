@@ -127,30 +127,27 @@ fn main() {
 #[cfg(test)]
 mod test {
     use super::{find_pair, find_triple, TARGET};
-    use std::error;
 
     const NUMBERS: [i32; 6] = [1721, 979, 366, 299, 675, 1456];
 
     #[test]
-    fn part1() -> Result<(), Box<dyn error::Error>> {
+    fn part1_test() {
         let mut numbers = NUMBERS.clone();
         numbers.sort();
-        let (low, high) = find_pair(&numbers, TARGET)?;
+        let (low, high) = find_pair(&numbers, TARGET).unwrap();
         assert_eq!(TARGET, low + high);
         let product = low.checked_mul(high);
         assert_eq!(Some(514579), product);
-        Ok(())
     }
 
     #[test]
-    fn part2() -> Result<(), Box<dyn error::Error>> {
+    fn part2() {
         let mut numbers = NUMBERS.clone();
         numbers.sort();
-        let (low, middle, high) = find_triple(&numbers, TARGET)?;
+        let (low, middle, high) = find_triple(&numbers, TARGET).unwrap();
         let sum = low + middle + high;
         assert_eq!(TARGET, sum);
         let product = low * middle * high;
         assert_eq!(241861950, product);
-        Ok(())
     }
 }

@@ -205,7 +205,7 @@ impl Problem {
 mod test {
     use super::Problem;
 
-    use std::{error::Error, ops::RangeInclusive};
+    use std::ops::RangeInclusive;
 
     const EXAMPLE: &str = r"class: 1-3 or 5-7
 row: 6-11 or 33-44
@@ -232,8 +232,8 @@ nearby tickets:
         [[7, 3, 47], [40, 4, 50], [55, 2, 20], [38, 6, 12]];
 
     #[test]
-    fn parse_test() -> Result<(), Box<dyn Error>> {
-        let problem = Problem::parse(EXAMPLE.lines())?;
+    fn parse_test() {
+        let problem = Problem::parse(EXAMPLE.lines()).unwrap();
 
         for (field, (name, range1, range2)) in problem.fields.iter().zip(EXPECTED_FIELDS.iter()) {
             assert_eq!(field.name, *name);
@@ -241,18 +241,18 @@ nearby tickets:
             assert_eq!(&field.range2, range2);
         }
 
-        assert!(problem.your_ticket.eq(&EXPECTED_YOUR_TICKET));
-        assert!(problem.other_tickets().eq(EXPECTED_OTHER_TICKETS.iter()));
-
-        Ok(())
+        assert_eq!(problem.your_ticket, EXPECTED_YOUR_TICKET);
+        assert_eq!(
+            problem.other_tickets().collect::<Vec<_>>(),
+            EXPECTED_OTHER_TICKETS
+        );
     }
 
     #[test]
-    fn test_rate() -> Result<(), Box<dyn Error>> {
-        let problem = Problem::parse(EXAMPLE.lines())?;
+    fn test_rate() {
+        let problem = Problem::parse(EXAMPLE.lines()).unwrap();
         let result = problem.error_rate();
         assert_eq!(result, 71);
-        Ok(())
     }
 
     const EXAMPLE2: &str = r"class: 0-1 or 4-19
@@ -270,10 +270,9 @@ nearby tickets:
     const EXPECTED_ASSIGNMENTS: [usize; 3] = [1, 0, 2];
 
     #[test]
-    fn part2_test() -> Result<(), Box<dyn Error>> {
-        let problem = Problem::parse(EXAMPLE2.lines())?;
+    fn part2_test() {
+        let problem = Problem::parse(EXAMPLE2.lines()).unwrap();
         let field_assignments = problem.assign_fields();
-        assert!(EXPECTED_ASSIGNMENTS.iter().eq(field_assignments.iter()));
-        Ok(())
+        assert_eq!(&EXPECTED_ASSIGNMENTS[..], field_assignments);
     }
 }

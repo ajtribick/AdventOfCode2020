@@ -151,7 +151,6 @@ fn main() {
 #[cfg(test)]
 mod test {
     use super::{execute, execute_patched, Instruction, ProgramResult};
-    use std::error::Error;
 
     const EXAMPLE: [Instruction; 9] = [
         Instruction::Nop(0),
@@ -172,10 +171,9 @@ mod test {
     }
 
     #[test]
-    fn part2_test() -> Result<(), Box<dyn Error>> {
+    fn part2_test() {
         let mut program = EXAMPLE.clone();
-        let result = execute_patched(&mut program)?;
+        let result = execute_patched(&mut program).unwrap();
         assert_eq!(result, 8);
-        Ok(())
     }
 }

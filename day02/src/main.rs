@@ -117,7 +117,6 @@ fn main() {
 #[cfg(test)]
 mod test {
     use super::{count_valid, count_valid2, split_line, LineInfo};
-    use std::error::Error;
 
     const TEST_DATA: [&str; 3] = ["1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"];
 
@@ -145,26 +144,23 @@ mod test {
     }
 
     #[test]
-    fn parse_test() -> Result<(), Box<dyn Error>> {
+    fn parse_test() {
         let parse_result = TEST_DATA
             .iter()
-            .map(|&s| split_line(s))
-            .collect::<Result<Vec<_>, _>>()?;
-        assert!(parse_result.iter().eq(create_test_info().iter()));
-        Ok(())
+            .map(|&s| split_line(s).unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(parse_result, create_test_info());
     }
 
     #[test]
-    fn test1() -> Result<(), Box<dyn Error>> {
-        let count = count_valid(create_test_info().iter())?;
+    fn test1() {
+        let count = count_valid(create_test_info().iter()).unwrap();
         assert_eq!(count, 2);
-        Ok(())
     }
 
     #[test]
-    fn test2() -> Result<(), Box<dyn Error>> {
-        let count = count_valid2(create_test_info().iter())?;
+    fn test2() {
+        let count = count_valid2(create_test_info().iter()).unwrap();
         assert_eq!(count, 1);
-        Ok(())
     }
 }

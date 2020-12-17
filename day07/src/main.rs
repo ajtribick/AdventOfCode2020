@@ -106,8 +106,7 @@ dark violet bags contain no other bags.";
     fn part1_test() {
         let rules = RULES1
             .lines()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part1(&rules);
 
@@ -119,8 +118,7 @@ dark violet bags contain no other bags.";
         let rules = RULES1
             .lines()
             .rev()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part1(&rules);
 
@@ -131,8 +129,7 @@ dark violet bags contain no other bags.";
     fn part2_rules1_test() {
         let rules = RULES1
             .lines()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part2(&rules);
         assert_eq!(result, 32);
@@ -143,8 +140,7 @@ dark violet bags contain no other bags.";
         let rules = RULES1
             .lines()
             .rev()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part2(&rules);
         assert_eq!(result, 32);
@@ -154,8 +150,7 @@ dark violet bags contain no other bags.";
     fn part2_rules2_test() {
         let rules = RULES2
             .lines()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part2(&rules);
         assert_eq!(result, 126);
@@ -166,8 +161,7 @@ dark violet bags contain no other bags.";
         let rules = RULES2
             .lines()
             .rev()
-            .map(str::parse)
-            .map(Result::unwrap)
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
         let result = part2(&rules);
         assert_eq!(result, 126);

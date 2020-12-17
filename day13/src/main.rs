@@ -102,8 +102,6 @@ fn main() {
 mod test {
     use super::{parse_plan, part1, part2};
 
-    use std::error::Error;
-
     const EXAMPLE: &str = r"939
 7,13,x,x,59,x,31,19";
 
@@ -120,11 +118,10 @@ mod test {
     ];
 
     #[test]
-    fn test_parse() -> Result<(), Box<dyn Error>> {
-        let (time, buses) = parse_plan(EXAMPLE)?;
+    fn test_parse() {
+        let (time, buses) = parse_plan(EXAMPLE).unwrap();
         assert_eq!(time, 939);
-        assert!(buses.iter().eq(EXAMPLE_BUSES.iter()));
-        Ok(())
+        assert_eq!(buses, EXAMPLE_BUSES);
     }
 
     #[test]

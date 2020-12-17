@@ -94,7 +94,7 @@ mod test {
 
         let expected = [2, 7, 3, 4, 2];
 
-        assert!(trees.iter().eq(expected.iter()));
+        assert_eq!(trees, expected);
 
         assert_eq!(trees.iter().product::<u32>(), 336);
     }

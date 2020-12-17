@@ -80,10 +80,8 @@ impl FromStr for Rule {
 mod test {
     use super::Rule;
 
-    use std::error::Error;
-
     #[test]
-    fn rule_test() -> Result<(), Box<dyn Error>> {
+    fn rule_test() {
         let rule_text = r"light red bags contain 1 bright white bag, 2 muted yellow bags.
 dark orange bags contain 3 bright white bags, 4 muted yellow bags.
 bright white bags contain 1 shiny gold bag.
@@ -117,11 +115,9 @@ dotted black bags contain no other bags.";
 
         let parsed = rule_text
             .lines()
-            .map(str::parse)
-            .collect::<Result<Vec<Rule>, _>>()?;
+            .map(|s| s.parse().unwrap())
+            .collect::<Vec<_>>();
 
         assert_eq!(expected, parsed);
-
-        Ok(())
     }
 }
