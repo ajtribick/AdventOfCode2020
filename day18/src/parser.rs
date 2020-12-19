@@ -1,3 +1,5 @@
+use std::{error::Error, fmt};
+
 use nom::{
     branch::alt,
     character::complete::{char, digit1, multispace0, one_of},
@@ -6,7 +8,6 @@ use nom::{
     sequence::{delimited, preceded, tuple},
     Finish, IResult,
 };
-use std::{error::Error, fmt};
 
 #[derive(Debug)]
 pub struct ParseError(String);

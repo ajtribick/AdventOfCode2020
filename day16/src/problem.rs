@@ -1,6 +1,7 @@
+use std::{error::Error, fmt, iter, ops::RangeInclusive, str::FromStr};
+
 use bitvec::prelude::*;
 use regex::Regex;
-use std::{error::Error, fmt, iter, ops::RangeInclusive, str::FromStr};
 
 #[derive(Debug)]
 pub struct ParseError(&'static str);

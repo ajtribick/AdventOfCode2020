@@ -1,9 +1,10 @@
-use std::cmp::Ordering;
-use std::error;
-use std::fmt;
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::{
+    cmp::Ordering,
+    error, fmt,
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug)]
 enum Day1Error {

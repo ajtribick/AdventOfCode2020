@@ -1,5 +1,3 @@
-use ahash::AHashMap;
-use nom::Finish;
 use std::{
     error::Error,
     fmt,
@@ -7,6 +5,9 @@ use std::{
     io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
+
+use ahash::AHashMap;
+use nom::Finish;
 
 #[derive(Debug)]
 pub struct ParseError(String);

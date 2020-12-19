@@ -1,5 +1,8 @@
-use std::io::{self, BufRead, BufReader};
-use std::{fs::File, path::PathBuf};
+use std::{
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::PathBuf,
+};
 
 const SLOPES: [(usize, usize); 5] = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
 

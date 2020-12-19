@@ -1,7 +1,9 @@
-use std::error::Error;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::{
+    error::Error,
+    fs::File,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
 
 mod fields;
 mod part1;

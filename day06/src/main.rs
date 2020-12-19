@@ -1,8 +1,11 @@
+use std::{
+    error::Error,
+    fs::File,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
+
 use ahash::AHashSet;
-use std::error::Error;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
     let mut current = AHashSet::new();

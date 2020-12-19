@@ -1,8 +1,10 @@
-use std::error::Error;
-use std::fmt;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::{
+    error::Error,
+    fmt,
+    fs::File,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
 
 #[derive(Debug)]
 enum Day5Error {

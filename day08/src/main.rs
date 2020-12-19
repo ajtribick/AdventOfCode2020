@@ -1,9 +1,11 @@
-use std::error::Error;
-use std::fmt;
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-use std::path::PathBuf;
-use std::str::FromStr;
+use std::{
+    error::Error,
+    fmt,
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::PathBuf,
+    str::FromStr,
+};
 
 use bitvec::prelude::*;
 

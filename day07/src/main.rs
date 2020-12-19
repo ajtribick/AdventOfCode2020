@@ -1,8 +1,11 @@
+use std::{
+    error::Error,
+    fs::File,
+    io::{BufRead, BufReader},
+    path::PathBuf,
+};
+
 use ahash::{AHashMap, AHashSet};
-use std::error::Error;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
 
 mod day7error;
 mod rule;
