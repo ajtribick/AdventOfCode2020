@@ -6,7 +6,7 @@ use nom::{
     character::complete::{alpha1, char, digit1},
     combinator::{map, map_res, opt, recognize},
     multi::separated_list1,
-    sequence::{separated_pair, tuple},
+    sequence::{separated_pair, terminated, tuple},
     IResult,
 };
 
@@ -28,43 +28,35 @@ impl Rule {
     }
 }
 
-fn color(input: &str) -> IResult<&str, &str> {
-    recognize(separated_pair(alpha1, char(' '), alpha1))(input)
-}
-
-fn bag_list_entry(input: &str) -> IResult<&str, (i32, &str)> {
+fn color(input: &str) -> IResult<&str, String> {
     map(
-        tuple((
-            map_res(digit1, str::parse),
-            char(' '),
-            color,
-            tag(" bag"),
-            opt(char('s')),
-        )),
-        |(quantity, _, color_text, _, _)| (quantity, color_text),
+        recognize(separated_pair(alpha1, char(' '), alpha1)),
+        str::to_owned,
     )(input)
 }
 
-fn bag_list(input: &str) -> IResult<&str, Vec<(i32, &str)>> {
+fn bag_list_entry(input: &str) -> IResult<&str, (i32, String)> {
+    terminated(
+        separated_pair(map_res(digit1, str::parse), char(' '), color),
+        tuple((tag(" bag"), opt(char('s')))),
+    )(input)
+}
+
+fn bag_list(input: &str) -> IResult<&str, Vec<(i32, String)>> {
     separated_list1(tag(", "), bag_list_entry)(input)
 }
 
-fn no_bags(input: &str) -> IResult<&str, Vec<(i32, &str)>> {
+fn no_bags(input: &str) -> IResult<&str, Vec<(i32, String)>> {
     map(tag("no other bags"), |_| Vec::new())(input)
 }
 
 fn rule(input: &str) -> IResult<&str, Rule> {
     map(
-        tuple((
-            color,
-            tag(" bags contain "),
-            alt((no_bags, bag_list)),
+        terminated(
+            separated_pair(color, tag(" bags contain "), alt((no_bags, bag_list))),
             char('.'),
-        )),
-        |(c, _, bl, _)| Rule {
-            color: c.to_owned(),
-            bag_list: bl.iter().map(|&(n, bc)| (n, bc.to_owned())).collect(),
-        },
+        ),
+        |(color, bag_list)| Rule { color, bag_list },
     )(input)
 }
 
