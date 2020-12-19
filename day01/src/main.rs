@@ -31,7 +31,7 @@ fn get_numbers(path: impl AsRef<Path>) -> io::Result<Vec<i32>> {
     let infile = File::open(path)?;
     let mut numbers = BufReader::new(infile)
         .lines()
-        .filter_map(|l| l.map_or(None, |s| s.parse::<i32>().ok()))
+        .filter_map(|l| l.map_or(None, |s| s.parse().ok()))
         .collect::<Vec<_>>();
     numbers.sort_unstable();
     Ok(numbers)

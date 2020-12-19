@@ -91,7 +91,7 @@ fn part2(buses: &[Option<i64>]) -> Option<i64> {
 fn run() -> Result<(), Box<dyn Error>> {
     let plan = {
         let path = ["data", "day13", "input.txt"].iter().collect::<PathBuf>();
-        read_to_string(path)?.parse::<Plan>()?
+        read_to_string(path)?.parse()?
     };
     let result1 = part1(&plan).ok_or(ApplicationError("No buses"))?;
     println!("Part1: result = {}", result1);

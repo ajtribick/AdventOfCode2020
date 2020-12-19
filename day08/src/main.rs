@@ -62,7 +62,7 @@ enum ProgramResult {
 fn execute(program: &[Instruction]) -> ProgramResult {
     let mut accumulator = 0;
     let mut counter = 0;
-    let mut visited = BitVec::<LocalBits, usize>::repeat(false, program.len());
+    let mut visited = bitvec![0; program.len()];
     loop {
         if counter >= program.len() {
             return ProgramResult::Terminate(accumulator);
