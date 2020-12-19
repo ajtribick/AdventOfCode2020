@@ -120,15 +120,17 @@ fn process_waypoint<'a>(path: impl Iterator<Item = &'a Instruction>) -> i32 {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day12", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let instructions = BufReader::new(file)
-        .lines()
-        .map(|l| {
-            l.map_err(Box::<dyn Error>::from)
-                .and_then(|line| line.parse().map_err(Box::<dyn Error>::from))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let instructions = {
+        let path = ["data", "day12", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .map(|l| {
+                l.map_err(Box::<dyn Error>::from)
+                    .and_then(|line| line.parse().map_err(Box::<dyn Error>::from))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     println!("Part 1: result = {}", process_path(instructions.iter()));
     println!("Part 2: result = {}", process_waypoint(instructions.iter()));

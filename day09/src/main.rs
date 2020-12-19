@@ -59,7 +59,7 @@ where
         .filter_map(|w| {
             let target = *w.last().unwrap();
             preamble.copy_from_slice(&w[0..preamble_size]);
-            preamble.sort();
+            preamble.sort_unstable();
             match find_pair(&preamble, target) {
                 Some(_) => None,
                 None => Some(target),
@@ -79,7 +79,7 @@ where
     T: Add<Output = T> + AddAssign<T> + Copy + Ord,
 {
     let mut subsequence = sequence;
-    while subsequence.len() > 0 {
+    while !subsequence.is_empty() {
         let mut iterator = subsequence.iter().copied();
         let mut sum = iterator.next().unwrap();
         let mut min_element = sum;
@@ -111,15 +111,17 @@ fn part2(sequence: &[i64], target: i64) -> Result<(), Day9Error> {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day09", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let source = BufReader::new(file)
-        .lines()
-        .map(|l| {
-            l.map_err(Box::<dyn Error>::from)
-                .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let source = {
+        let path = ["data", "day09", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .map(|l| {
+                l.map_err(Box::<dyn Error>::from)
+                    .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
     let target = part1(&source)?;
     part2(&source, target)?;
     Ok(())

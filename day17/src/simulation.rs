@@ -19,10 +19,7 @@ enum Cube {
 
 impl Cube {
     pub fn is_active(&self) -> bool {
-        match self {
-            Self::Active => true,
-            _ => false,
-        }
+        matches!(self, Self::Active)
     }
 }
 
@@ -47,7 +44,7 @@ fn update_in_axes(pos: &mut [usize], axes: &[usize]) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
 fn update_in_range(pos: &mut [usize], start: &[usize], end: &[usize]) -> bool {
@@ -62,7 +59,7 @@ fn update_in_range(pos: &mut [usize], start: &[usize], end: &[usize]) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
 #[derive(Debug)]
@@ -80,12 +77,12 @@ impl Simulation {
         let mut axes = vec![1; dimensions];
 
         let lines = s.lines().collect::<Vec<_>>();
-        if lines.len() == 0 {
+        if lines.is_empty() {
             return Err(ParseSimulationError("Empty grid"));
         }
         axes[1] = lines.len();
 
-        if lines[0].len() == 0 {
+        if lines[0].is_empty() {
             return Err(ParseSimulationError("No row data"));
         }
         axes[0] = lines[0].len();
@@ -173,14 +170,14 @@ impl Simulation {
         let mut start = vec![0; new_axes.len()];
         let mut end = vec![0; new_axes.len()];
 
-        for i in 0..new_data.len() {
+        for cube in new_data.iter_mut() {
             self.get_src_pos(&dest_pos, &mut src_pos);
             self.get_range(&dest_pos, &mut start, &mut end);
 
             let (current_cube, active_count) =
                 self.check_neighbors(&src_pos, &start, &end, &mut scratch_pos);
 
-            new_data[i] = match current_cube {
+            *cube = match current_cube {
                 Cube::Inactive if active_count == 3 => Cube::Active,
                 Cube::Active if !(2..=3).contains(&active_count) => Cube::Inactive,
                 _ => current_cube,

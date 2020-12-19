@@ -1,4 +1,4 @@
-use std::{error::Error, fmt, fs::read_to_string, path::PathBuf};
+use std::{error::Error, fmt, fs::read_to_string, path::PathBuf, str::FromStr};
 
 #[derive(Debug)]
 struct ApplicationError(&'static str);
@@ -11,25 +11,35 @@ impl fmt::Display for ApplicationError {
 
 impl Error for ApplicationError {}
 
-fn parse_plan(plan: &str) -> Result<(i64, Vec<Option<i64>>), Box<dyn Error>> {
-    let mut plan_lines = plan.lines();
-    let time = plan_lines
-        .next()
-        .ok_or(ApplicationError("missing time"))?
-        .parse::<i64>()?;
-    let buses = plan_lines
-        .next()
-        .ok_or(ApplicationError("missing schedule"))?
-        .split(",")
-        .map(|s| s.parse::<i64>().ok())
-        .collect::<Vec<_>>();
-    Ok((time, buses))
+#[derive(Debug)]
+struct Plan {
+    time: i64,
+    buses: Vec<Option<i64>>,
 }
 
-fn part1(time: i64, buses: &[Option<i64>]) -> Option<i64> {
-    buses
+impl FromStr for Plan {
+    type Err = ApplicationError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut plan_lines = s.lines();
+        let time = plan_lines
+            .next()
+            .and_then(|s| s.parse().ok())
+            .ok_or(ApplicationError("missing time"))?;
+        let buses = plan_lines
+            .next()
+            .ok_or(ApplicationError("missing schedule"))?
+            .split(',')
+            .map(|t| t.parse().ok())
+            .collect::<Vec<_>>();
+        Ok(Plan { time, buses })
+    }
+}
+
+fn part1(plan: &Plan) -> Option<i64> {
+    plan.buses
         .iter()
-        .filter_map(|b| b.map(|bus| (bus, bus - time % bus)))
+        .filter_map(|b| b.map(|bus| (bus, bus - plan.time % bus)))
         .min_by(|(_, a), (_, b)| a.cmp(b))
         .map(|(bus, wait)| bus * wait)
 }
@@ -79,11 +89,14 @@ fn part2(buses: &[Option<i64>]) -> Option<i64> {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day13", "input.txt"].iter().collect::<PathBuf>();
-    let (time, buses) = parse_plan(&read_to_string(path)?)?;
-    let result1 = part1(time, &buses).ok_or(ApplicationError("No buses"))?;
+    let plan = {
+        let path = ["data", "day13", "input.txt"].iter().collect::<PathBuf>();
+        read_to_string(path)?.parse::<Plan>()?
+    };
+    let result1 = part1(&plan).ok_or(ApplicationError("No buses"))?;
     println!("Part1: result = {}", result1);
-    let result2 = part2(&buses).ok_or(ApplicationError("Schedule does not permit solution"))?;
+    let result2 =
+        part2(&plan.buses).ok_or(ApplicationError("Schedule does not permit solution"))?;
     println!("Part2: result = {}", result2);
     Ok(())
 }
@@ -100,7 +113,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use super::{parse_plan, part1, part2};
+    use super::{part1, part2, Plan};
 
     const EXAMPLE: &str = r"939
 7,13,x,x,59,x,31,19";
@@ -119,14 +132,18 @@ mod test {
 
     #[test]
     fn test_parse() {
-        let (time, buses) = parse_plan(EXAMPLE).unwrap();
-        assert_eq!(time, 939);
-        assert_eq!(buses, EXAMPLE_BUSES);
+        let plan = EXAMPLE.parse::<Plan>().unwrap();
+        assert_eq!(plan.time, 939);
+        assert_eq!(plan.buses, EXAMPLE_BUSES);
     }
 
     #[test]
     fn test_part1() {
-        let result = part1(EXAMPLE_TIME, &EXAMPLE_BUSES).unwrap();
+        let plan = Plan {
+            time: EXAMPLE_TIME,
+            buses: EXAMPLE_BUSES.into(),
+        };
+        let result = part1(&plan).unwrap();
         assert_eq!(result, 295);
     }
 

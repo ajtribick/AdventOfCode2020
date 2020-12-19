@@ -57,12 +57,14 @@ pub fn part2(lines: &[Rule]) -> usize {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day07", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let rules = BufReader::new(file)
-        .lines()
-        .map(|l| l.map_err(Day7Error::IoError).and_then(|s| s.parse()))
-        .collect::<Result<Vec<_>, _>>()?;
+    let rules = {
+        let path = ["data", "day07", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .map(|l| l.map_err(Day7Error::IoError).and_then(|s| s.parse()))
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     println!("Part 1: {} valid bags", part1(&rules));
     println!("Part 2: {} contained bags", part2(&rules));

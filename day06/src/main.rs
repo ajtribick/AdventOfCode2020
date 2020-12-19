@@ -47,11 +47,13 @@ fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day06", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let lines = BufReader::new(file)
-        .lines()
-        .collect::<Result<Vec<_>, _>>()?;
+    let lines = {
+        let path = ["data", "day06", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     println!("Part 1: sum = {}", part1(lines.iter()));
     println!("Part 2: sum = {}", part2(lines.iter()));

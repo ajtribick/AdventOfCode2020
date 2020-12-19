@@ -36,7 +36,7 @@ impl Default for RuleMap {
     }
 }
 
-fn parse_char<'a>(c: char, s: &'a str) -> Option<&'a str> {
+fn parse_char(c: char, s: &str) -> Option<&str> {
     let mut char_indices = s.char_indices();
     match char_indices.next() {
         Some((_, first)) if first == c => match char_indices.next() {
@@ -111,9 +111,10 @@ mod rule_parsing {
     };
 
     fn character(s: &str) -> IResult<&str, ParseRule> {
-        map(delimited(char('"'), anychar, char('"')), |c: char| {
-            ParseRule::Character(c)
-        })(s)
+        map(
+            delimited(char('"'), anychar, char('"')),
+            ParseRule::Character,
+        )(s)
     }
 
     fn number(s: &str) -> IResult<&str, u32> {

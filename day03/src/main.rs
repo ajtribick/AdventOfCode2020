@@ -29,7 +29,7 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) {
     println!("Part 1: encountered {} trees", trees);
 }
 
-fn part2(lines: &Vec<impl AsRef<str>>) {
+fn part2(lines: &[impl AsRef<str>]) {
     let result = SLOPES
         .iter()
         .map(|&(right_step, down_step)| count_trees(lines.iter(), right_step, down_step))
@@ -38,11 +38,13 @@ fn part2(lines: &Vec<impl AsRef<str>>) {
 }
 
 fn run() -> Result<(), io::Error> {
-    let path = ["data", "day03", "input.txt"].iter().collect::<PathBuf>();
-    let input_file = File::open(path)?;
-    let lines = BufReader::new(input_file)
-        .lines()
-        .collect::<Result<Vec<_>, _>>()?;
+    let lines = {
+        let path = ["data", "day03", "input.txt"].iter().collect::<PathBuf>();
+        let input_file = File::open(path)?;
+        BufReader::new(input_file)
+            .lines()
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     part1(lines.iter());
     part2(&lines);

@@ -68,7 +68,7 @@ fn parse_fields(
     let mut fields = Vec::new();
     let mut allowed = bitvec![0; 1000];
 
-    while let Some(line_ref) = lines.next() {
+    for line_ref in lines {
         let line: &str = line_ref.as_ref();
         if line.is_empty() {
             break;
@@ -118,7 +118,7 @@ impl Problem {
         let your_ticket = parse_ticket(
             lines
                 .next()
-                .ok_or(ParseError("No data for your ticket".into()))?
+                .ok_or(ParseError("No data for your ticket"))?
                 .as_ref(),
             field_count,
         )?;
@@ -184,15 +184,9 @@ impl Problem {
             let (field, allowed) = allowed_columns
                 .iter()
                 .enumerate()
-                .filter(|(_, a)| a.count_ones() == 1)
-                .next()
+                .find(|(_, a)| a.count_ones() == 1)
                 .expect("Backtracking not implemented");
-            let (col, _) = allowed
-                .iter()
-                .enumerate()
-                .filter(|(_, b)| **b)
-                .next()
-                .unwrap();
+            let (col, _) = allowed.iter().enumerate().find(|(_, b)| **b).unwrap();
             field_assignments[field] = col;
             allowed_columns.iter_mut().for_each(|a| a.set(col, false));
         }

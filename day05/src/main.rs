@@ -39,22 +39,23 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> 
 
 fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
     let mut ids = lines.map(calculate_id).collect::<Vec<_>>();
-    ids.sort();
+    ids.sort_unstable();
     let pair = ids
         .windows(2)
-        .filter(|&pair| pair[1] - pair[0] == 2)
-        .next()
+        .find(|&pair| pair[1] - pair[0] == 2)
         .ok_or(Day5Error::NotFound)?;
     println!("Part 2, found empty seat at {}", pair[0] + 1);
     Ok(())
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day05", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let lines = BufReader::new(file)
-        .lines()
-        .collect::<Result<Vec<_>, _>>()?;
+    let lines = {
+        let path = ["data", "day05", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .collect::<Result<Vec<_>, _>>()?
+    };
     part1(lines.iter())?;
     part2(lines.iter())?;
     Ok(())

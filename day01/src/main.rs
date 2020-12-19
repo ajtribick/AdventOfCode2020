@@ -32,7 +32,7 @@ fn get_numbers(path: impl AsRef<Path>) -> io::Result<Vec<i32>> {
         .lines()
         .filter_map(|l| l.map_or(None, |s| s.parse::<i32>().ok()))
         .collect::<Vec<_>>();
-    numbers.sort();
+    numbers.sort_unstable();
     Ok(numbers)
 }
 
@@ -132,8 +132,8 @@ mod test {
 
     #[test]
     fn part1_test() {
-        let mut numbers = NUMBERS.clone();
-        numbers.sort();
+        let mut numbers = NUMBERS;
+        numbers.sort_unstable();
         let (low, high) = find_pair(&numbers, TARGET).unwrap();
         assert_eq!(TARGET, low + high);
         let product = low.checked_mul(high);
@@ -142,8 +142,8 @@ mod test {
 
     #[test]
     fn part2() {
-        let mut numbers = NUMBERS.clone();
-        numbers.sort();
+        let mut numbers = NUMBERS;
+        numbers.sort_unstable();
         let (low, middle, high) = find_triple(&numbers, TARGET).unwrap();
         let sum = low + middle + high;
         assert_eq!(TARGET, sum);

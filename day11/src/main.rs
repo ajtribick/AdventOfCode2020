@@ -16,8 +16,10 @@ fn part2(mut plan: SeatingPlan) {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day11", "input.txt"].iter().collect::<PathBuf>();
-    let plan = read_to_string(path)?.parse::<SeatingPlan>()?;
+    let plan = {
+        let path = ["data", "day11", "input.txt"].iter().collect::<PathBuf>();
+        read_to_string(path)?.parse::<SeatingPlan>()?
+    };
     part1(plan.clone());
     part2(plan);
     Ok(())

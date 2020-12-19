@@ -1,5 +1,4 @@
 use crate::fields::check_valid;
-use std::collections::HashSet;
 
 const EYE_COLORS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
@@ -9,10 +8,10 @@ fn value_ok<'a>(prefix: &'a str, value: &'a str) -> bool {
         "iyr" => value.len() == 4 && (2010..=2020).contains(&value.parse::<i32>().unwrap_or(0)),
         "eyr" => value.len() == 4 && (2020..=2030).contains(&value.parse::<i32>().unwrap_or(0)),
         "hgt" => {
-            if value.ends_with("cm") {
-                (150..=193).contains(&value[..value.len() - 2].parse::<i32>().unwrap_or(0))
-            } else if value.ends_with("in") {
-                (59..=76).contains(&value[..value.len() - 2].parse::<i32>().unwrap_or(0))
+            if let Some(height) = value.strip_suffix("cm") {
+                (150..=193).contains(&height.parse::<i32>().unwrap_or(0))
+            } else if let Some(height) = value.strip_suffix("in") {
+                (59..=76).contains(&height.parse::<i32>().unwrap_or(0))
             } else {
                 false
             }
@@ -39,7 +38,7 @@ fn count_valid(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
                 _ => (valid, None),
             },
             item_str => {
-                let mut updated = current.unwrap_or(HashSet::new());
+                let mut updated = current.unwrap_or_default();
                 item_str
                     .split(' ')
                     .map(|s| {

@@ -13,8 +13,10 @@ fn process(initial: &str, dimensions: usize) -> Result<usize, ParseSimulationErr
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day17", "input.txt"].iter().collect::<PathBuf>();
-    let initial = read_to_string(path)?;
+    let initial = {
+        let path = ["data", "day17", "input.txt"].iter().collect::<PathBuf>();
+        read_to_string(path)?
+    };
     println!("Part 1: result = {}", process(&initial, 3)?);
     println!("Part 2: result = {}", process(&initial, 4)?);
     Ok(())

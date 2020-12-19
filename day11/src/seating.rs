@@ -2,11 +2,20 @@ use std::{cmp::min, fmt, str::FromStr};
 
 use crate::error::Day11Error;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 enum Seat {
     Empty,
     Unoccupied,
     Occupied,
+}
+
+impl Seat {
+    pub fn is_occupied(&self) -> bool {
+        matches!(self, Seat::Occupied)
+    }
+    pub fn is_seat(&self) -> bool {
+        !matches!(self, Seat::Empty)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -19,24 +28,22 @@ pub struct SeatingPlan {
 }
 
 fn count_line(line: &[Seat]) -> usize {
-    line.iter().filter(|s| **s == Seat::Occupied).count()
+    line.iter().filter(|s| s.is_occupied()).count()
 }
 
 fn scan_left(src: &[Seat], i: usize, x: usize) -> bool {
     src[i - x..i]
         .iter()
         .rev()
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_right(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
     src[i + 1..i + width - x]
         .iter()
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_up(src: &[Seat], i: usize, width: usize) -> bool {
@@ -45,9 +52,8 @@ fn scan_up(src: &[Seat], i: usize, width: usize) -> bool {
         .rev()
         .step_by(width)
         .skip(1)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_down(src: &[Seat], i: usize, width: usize) -> bool {
@@ -55,9 +61,8 @@ fn scan_down(src: &[Seat], i: usize, width: usize) -> bool {
         .iter()
         .step_by(width)
         .skip(1)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_left_up(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
@@ -67,9 +72,8 @@ fn scan_left_up(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
         .step_by(width + 1)
         .skip(1)
         .take(x)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_right_up(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
@@ -79,9 +83,8 @@ fn scan_right_up(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
         .step_by(width - 1)
         .skip(1)
         .take(width - x - 1)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_left_down(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
@@ -90,9 +93,8 @@ fn scan_left_down(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
         .step_by(width - 1)
         .skip(1)
         .take(x)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 fn scan_right_down(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
@@ -101,9 +103,8 @@ fn scan_right_down(src: &[Seat], i: usize, x: usize, width: usize) -> bool {
         .step_by(width + 1)
         .skip(1)
         .take(width - x - 1)
-        .filter(|&&s| s != Seat::Empty)
-        .next()
-        .map_or(false, |&s| s == Seat::Occupied)
+        .find(|s| s.is_seat())
+        .map_or(false, Seat::is_occupied)
 }
 
 impl SeatingPlan {
@@ -116,10 +117,7 @@ impl SeatingPlan {
     }
 
     pub fn occupied(&self) -> usize {
-        self.current()
-            .iter()
-            .filter(|s| **s == Seat::Occupied)
-            .count()
+        self.current().iter().filter(|s| s.is_occupied()).count()
     }
 
     pub fn update(&mut self) -> bool {
@@ -138,7 +136,7 @@ impl SeatingPlan {
         while let Some(curr_line) = curr {
             for x in 0..curr_line.len() {
                 let current = curr_line[x];
-                if current == Seat::Empty {
+                if !current.is_seat() {
                     dest.next();
                     continue;
                 }
@@ -181,7 +179,7 @@ impl SeatingPlan {
 
         for i in 0..src.len() {
             let current = src[i];
-            if current == Seat::Empty {
+            if !current.is_seat() {
                 dest.next();
                 continue;
             }

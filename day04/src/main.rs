@@ -11,11 +11,13 @@ use part1::part1;
 use part2::part2;
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day04", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let lines = BufReader::new(file)
-        .lines()
-        .collect::<Result<Vec<_>, _>>()?;
+    let lines = {
+        let path = ["data", "day04", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     part1(lines.iter());
     part2(lines.iter());

@@ -8,7 +8,7 @@ use std::{
 
 fn count_differences(source: &[i32]) -> usize {
     let mut adapters = source.to_vec();
-    adapters.sort();
+    adapters.sort_unstable();
     let (_, count1, count3) =
         adapters
             .iter()
@@ -25,7 +25,7 @@ fn count_differences(source: &[i32]) -> usize {
 
 fn count_ways(source: &[i32]) -> u64 {
     let mut adapters = source.to_vec();
-    adapters.sort_by_key(|&a| Reverse(a));
+    adapters.sort_unstable_by_key(|&a| Reverse(a));
     adapters.push(0);
     let mut scores = Vec::with_capacity(adapters.len());
     scores.push(1);
@@ -45,15 +45,17 @@ fn count_ways(source: &[i32]) -> u64 {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day10", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let adapters = BufReader::new(file)
-        .lines()
-        .map(|l| {
-            l.map_err(Box::<dyn Error>::from)
-                .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let adapters = {
+        let path = ["data", "day10", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .map(|l| {
+                l.map_err(Box::<dyn Error>::from)
+                    .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
 
     println!("Part 1: result = {}", count_differences(&adapters));
     println!("Part 2: result = {}", count_ways(&adapters));

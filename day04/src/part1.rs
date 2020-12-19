@@ -1,5 +1,4 @@
 use crate::fields::check_valid;
-use std::collections::HashSet;
 
 fn count_valid<T: AsRef<str>>(lines: impl Iterator<Item = T>) -> usize {
     let (num_valid, last_item) =
@@ -9,7 +8,7 @@ fn count_valid<T: AsRef<str>>(lines: impl Iterator<Item = T>) -> usize {
                 _ => (valid, None),
             },
             item_str => {
-                let mut updated = current.unwrap_or(HashSet::new());
+                let mut updated = current.unwrap_or_default();
                 item_str
                     .split(' ')
                     .map(|s| s.split(':').next().unwrap_or(""))

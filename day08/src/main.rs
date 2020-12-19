@@ -51,7 +51,7 @@ impl FromStr for Instruction {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 enum ProgramResult {
     Terminate(i32),
     Loop(i32),
@@ -127,12 +127,14 @@ fn part2(program: &mut [Instruction]) -> Result<(), Day8Error> {
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
-    let path = ["data", "day08", "input.txt"].iter().collect::<PathBuf>();
-    let file = File::open(path)?;
-    let mut program = BufReader::new(file)
-        .lines()
-        .map(|l| l.map_err(Day8Error::IoError).and_then(|s| s.parse()))
-        .collect::<Result<Vec<_>, _>>()?;
+    let mut program = {
+        let path = ["data", "day08", "input.txt"].iter().collect::<PathBuf>();
+        let file = File::open(path)?;
+        BufReader::new(file)
+            .lines()
+            .map(|l| l.map_err(Day8Error::IoError).and_then(|s| s.parse()))
+            .collect::<Result<Vec<_>, _>>()?
+    };
     part1(&program)?;
     part2(&mut program)?;
     Ok(())
@@ -167,7 +169,11 @@ mod test {
     #[test]
     fn part1_test() {
         let result = execute(&EXAMPLE);
-        assert_eq!(result, ProgramResult::Loop(5));
+        assert!(
+            matches!(result, ProgramResult::Loop(5)),
+            "Bad result {:?}",
+            result
+        );
     }
 
     #[test]
