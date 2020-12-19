@@ -65,6 +65,9 @@ version = "0.1.0"
 [[package]]
 name = "day04"
 version = "0.1.0"
+dependencies = [
+ "ahash",
+]
 
 [[package]]
 name = "day05"
@@ -73,11 +76,15 @@ version = "0.1.0"
 [[package]]
 name = "day06"
 version = "0.1.0"
+dependencies = [
+ "ahash",
+]
 
 [[package]]
 name = "day07"
 version = "0.1.0"
 dependencies = [
+ "ahash",
  "nom",
 ]
 
@@ -114,6 +121,9 @@ version = "0.1.0"
 [[package]]
 name = "day14"
 version = "0.1.0"
+dependencies = [
+ "ahash",
+]
 
 [[package]]
 name = "day15"

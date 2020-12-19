@@ -1,11 +1,11 @@
-use std::collections::HashSet;
+use ahash::AHashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
-    let mut current = HashSet::new();
+    let mut current = AHashSet::new();
     let result = lines.fold(0, |acc, l| match l.as_ref() {
         "" => {
             let group_len = current.len();
@@ -23,7 +23,7 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
 }
 
 fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
-    let mut current = HashSet::new();
+    let mut current = AHashSet::new();
     let result = lines
         .fold((0, true), |(total, is_start), l| match l.as_ref() {
             "" => {

@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use ahash::AHashMap;
 
 use crate::common::Instruction;
 
 pub fn execute_program<'a>(program: impl Iterator<Item = &'a Instruction>) -> u64 {
-    let mut memory = HashMap::new();
+    let mut memory = AHashMap::new();
     let mut or_mask = 0;
     let mut and_mask = u64::MAX;
     for instruction in program {

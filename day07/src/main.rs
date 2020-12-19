@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use ahash::{AHashMap, AHashSet};
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -13,7 +13,7 @@ use rule::Rule;
 const BAG_TYPE: &str = "shiny gold";
 
 fn part1(rules: &[Rule]) -> usize {
-    let mut nodes = HashMap::with_capacity(rules.len());
+    let mut nodes = AHashMap::with_capacity(rules.len());
     for rule in rules.iter() {
         for (_, color) in rule.bag_list() {
             match nodes.get_mut(&color[..]) {
@@ -29,7 +29,7 @@ fn part1(rules: &[Rule]) -> usize {
         }
     }
 
-    let mut visited = HashSet::with_capacity(nodes.len());
+    let mut visited = AHashSet::with_capacity(nodes.len());
     let mut todo = Vec::with_capacity(nodes.len());
     todo.push(BAG_TYPE);
 
@@ -45,7 +45,7 @@ fn part1(rules: &[Rule]) -> usize {
     total - 1
 }
 
-fn count_node(nodes: &HashMap<&str, &[(i32, String)]>, node: &str) -> usize {
+fn count_node(nodes: &AHashMap<&str, &[(i32, String)]>, node: &str) -> usize {
     nodes.get(node).unwrap().iter().fold(0, |acc, (n, t)| {
         acc + *n as usize * (1 + count_node(nodes, t))
     })
