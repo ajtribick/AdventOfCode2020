@@ -187,7 +187,7 @@ impl Problem {
                 .enumerate()
                 .find(|(_, a)| a.count_ones() == 1)
                 .expect("Backtracking not implemented");
-            let (col, _) = allowed.iter().enumerate().find(|(_, b)| **b).unwrap();
+            let col = allowed.iter().enumerate().find(|(_, b)| **b).unwrap().0;
             field_assignments[field] = col;
             allowed_columns.iter_mut().for_each(|a| a.set(col, false));
         }
