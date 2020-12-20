@@ -5,8 +5,12 @@ use std::{
     path::PathBuf,
 };
 
+#[macro_use]
+extern crate lazy_static;
+
 mod grid;
 mod tile;
+mod utils;
 
 use grid::Grid;
 
@@ -21,6 +25,10 @@ fn run() -> Result<(), Box<dyn Error>> {
         "Part 1: result = {}",
         grid.corner_ids().iter().product::<u64>()
     );
+
+    let mut merged = grid.merge_tiles();
+    merged.remove_monsters();
+    println!("Part 2: rougness = {}", merged.roughness());
 
     Ok(())
 }

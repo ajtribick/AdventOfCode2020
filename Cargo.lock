@@ -164,7 +164,7 @@ dependencies = [
 name = "day20"
 version = "0.1.0"
 dependencies = [
- "ahash",
+ "lazy_static",
 ]
 
 [[package]]
