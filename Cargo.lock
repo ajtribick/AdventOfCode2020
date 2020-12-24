@@ -186,6 +186,13 @@ name = "day23"
 version = "0.1.0"
 
 [[package]]
+name = "day24"
+version = "0.1.0"
+dependencies = [
+ "ahash",
+]
+
+[[package]]
 name = "derivative"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
