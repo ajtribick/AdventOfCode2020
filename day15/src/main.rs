@@ -47,7 +47,7 @@ mod test {
             ([3, 1, 2], 1836),
         ];
 
-        for (sequence, expected) in TESTS.iter() {
+        for (sequence, expected) in &TESTS {
             let result = elf_sequence(sequence, 2020);
             assert_eq!(result, *expected);
         }

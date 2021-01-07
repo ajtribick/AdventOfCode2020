@@ -71,65 +71,84 @@ impl FromStr for Instruction {
     }
 }
 
+#[derive(Debug)]
+struct Point {
+    north: i32,
+    east: i32,
+}
+
+impl Point {
+    pub fn manhattan_distance(&self) -> i32 {
+        self.north.abs() + self.east.abs()
+    }
+}
+
 fn process_path<'a>(path: impl Iterator<Item = &'a Instruction>) -> i32 {
-    let mut east = 0;
-    let mut north = 0;
+    let mut position = Point { north: 0, east: 0 };
     let mut direction = Direction::East;
 
     for instruction in path {
         match instruction {
-            Instruction::North(delta) => north += *delta,
-            Instruction::East(delta) => east += *delta,
+            Instruction::North(delta) => position.north += *delta,
+            Instruction::East(delta) => position.east += *delta,
             Instruction::Right(steps) => direction = direction.turn_right(*steps),
             Instruction::Forward(steps) => match direction {
-                Direction::East => east += *steps,
-                Direction::South => north -= *steps,
-                Direction::West => east -= *steps,
-                Direction::North => north += *steps,
+                Direction::East => position.east += *steps,
+                Direction::South => position.north -= *steps,
+                Direction::West => position.east -= *steps,
+                Direction::North => position.north += *steps,
             },
         }
     }
 
-    east.abs() + north.abs()
+    position.manhattan_distance()
 }
 
 fn process_waypoint<'a>(path: impl Iterator<Item = &'a Instruction>) -> i32 {
-    let mut ship = (0, 0);
-    let mut waypoint = (10, 1);
+    let mut ship = Point { north: 0, east: 0 };
+    let mut waypoint = Point { north: 1, east: 10 };
 
     for instruction in path {
         match instruction {
-            Instruction::North(delta) => waypoint.1 += delta,
-            Instruction::East(delta) => waypoint.0 += delta,
+            Instruction::North(delta) => waypoint.north += delta,
+            Instruction::East(delta) => waypoint.east += delta,
             Instruction::Right(steps) => {
                 waypoint = match steps & 0b11 {
-                    1 => (waypoint.1, -waypoint.0),
-                    2 => (-waypoint.0, -waypoint.1),
-                    3 => (-waypoint.1, waypoint.0),
+                    1 => Point {
+                        north: -waypoint.east,
+                        east: waypoint.north,
+                    },
+                    2 => Point {
+                        north: -waypoint.north,
+                        east: -waypoint.east,
+                    },
+                    3 => Point {
+                        north: waypoint.east,
+                        east: -waypoint.north,
+                    },
                     _ => waypoint,
                 }
             }
             Instruction::Forward(steps) => {
-                ship.0 += waypoint.0 * steps;
-                ship.1 += waypoint.1 * steps;
+                ship.north += waypoint.north * steps;
+                ship.east += waypoint.east * steps;
             }
         }
     }
 
-    ship.0.abs() + ship.1.abs()
+    ship.manhattan_distance()
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
     let instructions = {
         let path = ["data", "day12", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| {
-                l.map_err(Box::<dyn Error>::from)
-                    .and_then(|line| line.parse().map_err(Box::<dyn Error>::from))
-            })
-            .collect::<Result<Vec<_>, _>>()?
+        let mut instructions = Vec::new();
+        for line in BufReader::new(file).lines() {
+            instructions.push(line?.parse()?);
+        }
+
+        instructions
     };
 
     println!("Part 1: result = {}", process_path(instructions.iter()));
@@ -168,7 +187,7 @@ F11";
 
     #[test]
     fn turn_left_test() {
-        let test_cases = [
+        const TEST_CASES: [(Direction, i32, Direction); 9] = [
             (Direction::East, -4, Direction::East),
             (Direction::East, -3, Direction::South),
             (Direction::East, -2, Direction::West),
@@ -180,7 +199,7 @@ F11";
             (Direction::East, 4, Direction::East),
         ];
 
-        for (start, steps, finish) in test_cases.iter() {
+        for (start, steps, finish) in &TEST_CASES {
             let result = start.turn_right(*steps);
             assert_eq!(result, *finish);
 

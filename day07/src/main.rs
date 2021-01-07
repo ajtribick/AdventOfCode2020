@@ -17,7 +17,7 @@ const BAG_TYPE: &str = "shiny gold";
 
 fn part1(rules: &[Rule]) -> usize {
     let mut nodes = AHashMap::with_capacity(rules.len());
-    for rule in rules.iter() {
+    for rule in rules {
         for (_, color) in rule.bag_list() {
             match nodes.get_mut(&color[..]) {
                 None => {

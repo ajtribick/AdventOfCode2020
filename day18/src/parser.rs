@@ -127,7 +127,7 @@ mod test {
 
     #[test]
     fn expr_test() {
-        for &(src, expected, _) in EXAMPLES.iter() {
+        for &(src, expected, _) in &EXAMPLES {
             let result = parse(src, false).unwrap();
             assert_eq!(result, expected, "Failed on {}", src);
         }
@@ -135,7 +135,7 @@ mod test {
 
     #[test]
     fn expr_advanced_test() {
-        for &(src, _, expected) in EXAMPLES.iter() {
+        for &(src, _, expected) in &EXAMPLES {
             let result = parse(src, true).unwrap();
             assert_eq!(result, expected, "Failed on {}", src);
         }

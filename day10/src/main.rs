@@ -9,17 +9,19 @@ use std::{
 fn count_differences(source: &[i32]) -> usize {
     let mut adapters = source.to_vec();
     adapters.sort_unstable();
-    let (_, count1, count3) =
-        adapters
-            .iter()
-            .copied()
-            .fold((0, 0, 1), |(previous, count1, count3), i| {
-                match i - previous {
-                    1 => (i, count1 + 1, count3),
-                    3 => (i, count1, count3 + 1),
-                    _ => (i, count1, count3),
-                }
-            });
+    let mut previous = 0;
+    let mut count1 = 0;
+    let mut count3 = 1;
+    for adapter in adapters {
+        match adapter - previous {
+            1 => count1 += 1,
+            3 => count3 += 1,
+            _ => (),
+        }
+
+        previous = adapter;
+    }
+
     count1 * count3
 }
 
@@ -29,7 +31,7 @@ fn count_ways(source: &[i32]) -> u64 {
     adapters.push(0);
     let mut scores = Vec::with_capacity(adapters.len());
     scores.push(1);
-    for &adapter in adapters[1..].iter() {
+    for &adapter in &adapters[1..] {
         let score = adapters
             .iter()
             .copied()
@@ -48,13 +50,12 @@ fn run() -> Result<(), Box<dyn Error>> {
     let adapters = {
         let path = ["data", "day10", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| {
-                l.map_err(Box::<dyn Error>::from)
-                    .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
-            })
-            .collect::<Result<Vec<_>, _>>()?
+        let mut adapters = Vec::new();
+        for line in BufReader::new(file).lines() {
+            adapters.push(line?.parse()?);
+        }
+
+        adapters
     };
 
     println!("Part 1: result = {}", count_differences(&adapters));

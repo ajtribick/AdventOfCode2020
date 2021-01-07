@@ -86,7 +86,7 @@ mod test {
 
     #[test]
     fn parse_test() {
-        for &(pass, expected_id) in EXAMPLE_IDS.iter() {
+        for &(pass, expected_id) in &EXAMPLE_IDS {
             let actual_id = calculate_id(pass);
             assert_eq!(actual_id, expected_id);
         }

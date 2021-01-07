@@ -50,7 +50,7 @@ fn parse_char(c: char, s: &str) -> Option<&str> {
 
 fn parse_seq<'a>(rule_map: &RuleMap, seq: &[u32], s: &'a str) -> Option<&'a str> {
     let mut remaining = s;
-    for sub_rule in seq.iter() {
+    for sub_rule in seq {
         match test_rule(rule_map, *sub_rule, remaining) {
             Some(r) => remaining = r,
             _ => return None,
@@ -236,7 +236,7 @@ mod test {
             .lines()
             .for_each(|line| rule_map.try_add_rule(line).unwrap());
 
-        for &(message, expected) in PART1_TESTS.iter() {
+        for &(message, expected) in &PART1_TESTS {
             let result = test_rules(&rule_map, message);
             assert_eq!(result, expected, "message {} failed", message);
         }
@@ -299,7 +299,7 @@ mod test {
             .lines()
             .for_each(|line| rule_map.try_add_rule(line).unwrap());
         rule_map.update_rules();
-        for &(message, expected) in PART2_TESTS.iter() {
+        for &(message, expected) in &PART2_TESTS {
             let result = test_rules(&rule_map, message);
             assert_eq!(result, expected, "message {} failed", message);
         }

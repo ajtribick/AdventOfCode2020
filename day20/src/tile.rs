@@ -418,7 +418,7 @@ mod tests {
             (1171, vec![1489, 2473]),
         ];
 
-        for (id, expected) in expected_connections.iter() {
+        for (id, expected) in &expected_connections {
             let tile = tiles.iter().find(|t| t.id() == *id).unwrap();
             for other_tile in tiles.iter().filter(|t| t.id() != tile.id()) {
                 assert_ne!(

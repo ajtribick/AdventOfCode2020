@@ -11,13 +11,14 @@ impl fmt::Display for ParseError {
 
 impl Error for ParseError {}
 
+const SUBJECT_NUMBER: u64 = 7;
 const ENCRYPTION_SIZE: u64 = 20201227;
 
 fn loop_size(target: u64) -> u64 {
     let mut count = 0;
     let mut value = 1;
     while value != target {
-        value = (value * 7) % ENCRYPTION_SIZE;
+        value = (value * SUBJECT_NUMBER) % ENCRYPTION_SIZE;
         count += 1;
     }
 

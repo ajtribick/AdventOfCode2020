@@ -2,27 +2,22 @@ use std::{
     error::Error,
     fmt,
     fs::File,
-    io::{self, BufRead, BufReader},
+    io::{BufRead, BufReader},
     path::PathBuf,
-    str::FromStr,
 };
 
-#[derive(Debug)]
-enum Day2Error {
-    IoError(io::Error),
-    ParseError,
-}
+use nom::Finish;
 
-impl fmt::Display for Day2Error {
+#[derive(Debug)]
+struct ParseError {}
+
+impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Day2Error::IoError(e) => write!(f, "IO error {}", e),
-            Day2Error::ParseError => write!(f, "Parse error"),
-        }
+        write!(f, "Parse error")
     }
 }
 
-impl Error for Day2Error {}
+impl Error for ParseError {}
 
 #[derive(Debug, PartialEq)]
 struct LineInfo {
@@ -32,35 +27,53 @@ struct LineInfo {
     pub password: String,
 }
 
-fn iter_parse<'a, T: FromStr>(iter: &mut impl Iterator<Item = &'a str>) -> Result<T, Day2Error> {
-    iter.next()
-        .map(|s| s.parse().ok())
-        .flatten()
-        .ok_or(Day2Error::ParseError)
-}
+mod line_parsing {
+    use super::LineInfo;
 
-fn split_line(line: impl AsRef<str>) -> Result<LineInfo, Day2Error> {
-    let mut parts = line
-        .as_ref()
-        .split(|c| matches!(c, '-' | ' ' | ':'))
-        .filter(|&s| !s.is_empty());
-    let min = iter_parse(&mut parts)?;
-    let max = iter_parse(&mut parts)?;
-    let character = iter_parse(&mut parts)?;
-    let password = parts.next().ok_or(Day2Error::ParseError)?.into();
-    match parts.next() {
-        None => Ok(LineInfo {
-            min,
-            max,
-            character,
-            password,
-        }),
-        _ => Err(Day2Error::ParseError),
+    use nom::{
+        bytes::complete::tag,
+        character::complete::{alpha1, anychar, char, digit1},
+        combinator::{map, map_res},
+        sequence::separated_pair,
+        IResult,
+    };
+
+    fn min_max(input: &str) -> IResult<&str, (usize, usize)> {
+        separated_pair(
+            map_res(digit1, str::parse),
+            char('-'),
+            map_res(digit1, str::parse),
+        )(input)
+    }
+
+    fn min_max_char(input: &str) -> IResult<&str, (usize, usize, char)> {
+        map(
+            separated_pair(min_max, char(' '), anychar),
+            |((min, max), character)| (min, max, character),
+        )(input)
+    }
+
+    pub(super) fn line_parser(input: &str) -> IResult<&str, LineInfo> {
+        map(
+            separated_pair(min_max_char, tag(": "), alpha1),
+            |((min, max, character), password)| LineInfo {
+                min,
+                max,
+                character,
+                password: password.to_owned(),
+            },
+        )(input)
     }
 }
 
-fn count_valid<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> Result<usize, Day2Error> {
-    Ok(parsed_lines
+fn split_line(line: impl AsRef<str>) -> Result<LineInfo, ParseError> {
+    line_parsing::line_parser(line.as_ref())
+        .finish()
+        .map_or(Err(ParseError {}), |(_, li)| Ok(li))
+}
+
+fn count_valid<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> usize {
+    parsed_lines
         .filter(|&line_info| {
             let occurrence = line_info
                 .password
@@ -70,11 +83,11 @@ fn count_valid<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> Result<u
                 .count();
             (line_info.min..=line_info.max).contains(&occurrence)
         })
-        .count())
+        .count()
 }
 
-fn count_valid2<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> Result<usize, Day2Error> {
-    Ok(parsed_lines
+fn count_valid2<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> usize {
+    parsed_lines
         .filter(|&line_info| {
             let mut password_chars = line_info.password.chars();
             let first_ok = password_chars
@@ -85,22 +98,24 @@ fn count_valid2<'a>(parsed_lines: impl Iterator<Item = &'a LineInfo>) -> Result<
                 .map_or(false, |c| c == line_info.character);
             first_ok ^ second_ok
         })
-        .count())
+        .count()
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
     let parsed_lines = {
         let path = ["data", "day02", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| l.map_err(Day2Error::IoError).and_then(split_line))
-            .collect::<Result<Vec<_>, _>>()?
+        let mut parsed_lines = Vec::new();
+        for line in BufReader::new(file).lines() {
+            parsed_lines.push(split_line(line?)?);
+        }
+
+        parsed_lines
     };
 
-    let part1 = count_valid(parsed_lines.iter())?;
+    let part1 = count_valid(parsed_lines.iter());
     println!("Part 1: found {} valid passwords", part1);
-    let part2 = count_valid2(parsed_lines.iter())?;
+    let part2 = count_valid2(parsed_lines.iter());
     println!("Part 2: found {} valid passwords", part2);
     Ok(())
 }
@@ -155,13 +170,13 @@ mod test {
 
     #[test]
     fn test1() {
-        let count = count_valid(create_test_info().iter()).unwrap();
+        let count = count_valid(create_test_info().iter());
         assert_eq!(count, 2);
     }
 
     #[test]
     fn test2() {
-        let count = count_valid2(create_test_info().iter()).unwrap();
+        let count = count_valid2(create_test_info().iter());
         assert_eq!(count, 1);
     }
 }

@@ -11,20 +11,18 @@ fn count_trees(
     right_step: usize,
     down_step: usize,
 ) -> u32 {
-    lines
-        .step_by(down_step)
-        .fold((0, 0), |(mut trees, mut pos), line| {
-            let line_ref = line.as_ref();
-            if line_ref.chars().nth(pos).unwrap() == '#' {
-                trees += 1;
-            }
-            pos += right_step;
-            if pos >= line_ref.len() {
-                pos -= line_ref.len();
-            }
-            (trees, pos)
-        })
-        .0
+    let mut pos = 0;
+    let mut trees = 0;
+    for line_ref in lines.step_by(down_step) {
+        let line = line_ref.as_ref();
+        if line.as_bytes()[pos] == b'#' {
+            trees += 1;
+        }
+
+        pos = (pos + right_step) % line.len();
+    }
+
+    trees
 }
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) {

@@ -1,5 +1,7 @@
 use std::{cmp::min, error::Error, fmt};
 
+use itertools::izip;
+
 #[derive(Debug)]
 pub struct ParseSimulationError(&'static str);
 
@@ -26,7 +28,7 @@ impl Cube {
 fn coords_to_idx(coords: &[usize], axes: &[usize]) -> usize {
     let mut idx = coords[0];
     let mut step = 1;
-    for (c, a) in coords[1..].iter().zip(axes.iter()) {
+    for (c, a) in izip!(&coords[1..], axes) {
         step *= a;
         idx += c * step;
     }
@@ -108,27 +110,20 @@ impl Simulation {
     }
 
     fn get_src_pos(&self, dest_pos: &[usize], src_pos: &mut [usize]) {
-        src_pos
-            .iter_mut()
-            .zip(dest_pos.iter().zip(self.axes.iter()))
-            .for_each(|(s, (d, a))| {
-                *s = if (1..=*a).contains(d) {
-                    d - 1
-                } else {
-                    usize::MAX
-                }
-            });
+        for (src, dest, axis) in izip!(src_pos, dest_pos, self.axes.iter()) {
+            *src = if (1..=*axis).contains(dest) {
+                dest - 1
+            } else {
+                usize::MAX
+            }
+        }
     }
 
     fn get_range(&self, dest_pos: &[usize], start: &mut [usize], end: &mut [usize]) {
-        dest_pos
-            .iter()
-            .zip(self.axes.iter())
-            .zip(start.iter_mut().zip(end.iter_mut()))
-            .for_each(|((x, a), (s, e))| {
-                *s = x.saturating_sub(2);
-                *e = min(x + 1, *a);
-            });
+        for (x, a, s, e) in izip!(dest_pos, self.axes.iter(), start, end) {
+            *s = x.saturating_sub(2);
+            *e = min(x + 1, *a);
+        }
     }
 
     fn check_neighbors(

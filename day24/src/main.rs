@@ -107,9 +107,9 @@ impl Floor {
         let mut new_tiles = AHashSet::with_capacity(self.count_black_tiles() * 2);
         let mut white_tile_check = AHashSet::with_capacity(self.count_black_tiles() * 6);
 
-        for coordinates in self.black_tiles.iter() {
+        for coordinates in &self.black_tiles {
             let mut neighbor_count = 0;
-            for neighbor in coordinates.get_neighbors().iter() {
+            for neighbor in &coordinates.get_neighbors() {
                 if self.black_tiles.contains(neighbor) {
                     neighbor_count += 1;
                 } else {

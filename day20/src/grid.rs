@@ -131,10 +131,10 @@ impl Grid {
         let mut tile_data = Vec::with_capacity(self.size * self.size * inner_size * inner_size);
         for grid_row in self.tiles.chunks(self.size) {
             for row in 1..=inner_size {
-                for tile in grid_row.iter() {
+                for tile in grid_row {
                     let inner_start = self.tile_size * row + 1;
                     let inner_end = self.tile_size * (row + 1) - 1;
-                    for &element in tile.data()[inner_start..inner_end].iter() {
+                    for &element in &tile.data()[inner_start..inner_end] {
                         tile_data.push(element);
                     }
                 }

@@ -2,7 +2,7 @@ use std::{
     error::Error,
     fmt,
     fs::File,
-    io::{self, BufRead, BufReader},
+    io::{BufRead, BufReader},
     path::PathBuf,
     str::FromStr,
 };
@@ -11,7 +11,6 @@ use bitvec::prelude::*;
 
 #[derive(Debug)]
 enum Day8Error {
-    IoError(io::Error),
     ParseError,
     NoSolution,
 }
@@ -19,7 +18,6 @@ enum Day8Error {
 impl fmt::Display for Day8Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::IoError(e) => write!(f, "IO Error ({})", e),
             Self::ParseError => write!(f, "Parse error"),
             Self::NoSolution => write!(f, "No solution found"),
         }
@@ -63,10 +61,7 @@ fn execute(program: &[Instruction]) -> ProgramResult {
     let mut accumulator = 0;
     let mut counter = 0;
     let mut visited = bitvec![0; program.len()];
-    loop {
-        if counter >= program.len() {
-            return ProgramResult::Terminate(accumulator);
-        }
+    while counter < program.len() {
         if visited[counter] {
             return ProgramResult::Loop(accumulator);
         }
@@ -81,6 +76,8 @@ fn execute(program: &[Instruction]) -> ProgramResult {
             Instruction::Nop(_) => counter += 1,
         }
     }
+
+    ProgramResult::Terminate(accumulator)
 }
 
 fn part1(program: &[Instruction]) -> Result<(), Day8Error> {
@@ -94,13 +91,13 @@ fn part1(program: &[Instruction]) -> Result<(), Day8Error> {
 }
 
 fn patch(instruction: &mut Instruction) -> bool {
-    match *instruction {
+    match instruction {
         Instruction::Jmp(delta) => {
-            *instruction = Instruction::Nop(delta);
+            *instruction = Instruction::Nop(*delta);
             true
         }
         Instruction::Nop(delta) => {
-            *instruction = Instruction::Jmp(delta);
+            *instruction = Instruction::Jmp(*delta);
             true
         }
         _ => false,
@@ -132,10 +129,12 @@ fn run() -> Result<(), Box<dyn Error>> {
     let mut program = {
         let path = ["data", "day08", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| l.map_err(Day8Error::IoError).and_then(|s| s.parse()))
-            .collect::<Result<Vec<_>, _>>()?
+        let mut program = Vec::new();
+        for line in BufReader::new(file).lines() {
+            program.push(line?.parse()?);
+        }
+
+        program
     };
     part1(&program)?;
     part2(&mut program)?;

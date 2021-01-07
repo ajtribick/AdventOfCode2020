@@ -41,26 +41,23 @@ fn find_pair(numbers: &[i32], target: i32) -> Result<(i32, i32), Day1Error> {
     assert!(numbers.len() >= 2);
     assert!(numbers.windows(2).all(|w| w[0] <= w[1])); // numbers.is_sorted() in unstable
 
-    let mut numbers_fwd = numbers.iter();
-    let mut numbers_rev = numbers.iter().rev();
+    let mut it = numbers.iter();
 
-    let mut low = *numbers_fwd.next().ok_or(Day1Error::EmptySeq)?;
-    let mut high = *numbers_rev.next().ok_or(Day1Error::EmptySeq)?;
+    let mut low = *it.next().ok_or(Day1Error::EmptySeq)?;
+    let mut high = *it.next_back().ok_or(Day1Error::EmptySeq)?;
 
-    for _ in 0..numbers.len() - 1 {
+    loop {
         let total = low + high;
         match total.cmp(&target) {
             Ordering::Equal => return Ok((low, high)),
             Ordering::Less => {
-                low = *numbers_fwd.next().ok_or(Day1Error::NotFound)?;
+                low = *it.next().ok_or(Day1Error::NotFound)?;
             }
             Ordering::Greater => {
-                high = *numbers_rev.next().ok_or(Day1Error::NotFound)?;
+                high = *it.next_back().ok_or(Day1Error::NotFound)?;
             }
         }
     }
-
-    Err(Day1Error::NotFound)
 }
 
 fn find_triple(numbers: &[i32], target: i32) -> Result<(i32, i32, i32), Day1Error> {

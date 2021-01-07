@@ -13,14 +13,12 @@ fn run() -> Result<(), Box<dyn Error>> {
     let program = {
         let path = ["data", "day14", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|line_err| {
-                line_err
-                    .map_err(Box::<dyn Error>::from)
-                    .and_then(|line| line.parse().map_err(Box::<dyn Error>::from))
-            })
-            .collect::<Result<Vec<_>, _>>()?
+        let mut program = Vec::new();
+        for line in BufReader::new(file).lines() {
+            program.push(line?.parse()?);
+        }
+
+        program
     };
 
     let result1 = part1::execute_program(program.iter());

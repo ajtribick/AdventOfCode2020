@@ -422,7 +422,7 @@ LLL###LLL#
 
     #[test]
     fn test_string_roundtrip() {
-        for &layout in EXAMPLES_PART1.iter() {
+        for &layout in &EXAMPLES_PART1 {
             let plan = layout.parse::<SeatingPlan>().unwrap();
             let result = plan.to_string();
             assert_eq!(result, layout);
@@ -432,7 +432,7 @@ LLL###LLL#
     #[test]
     fn test_update() {
         let mut plan = EXAMPLES_PART1[0].parse::<SeatingPlan>().unwrap();
-        for &expected in EXAMPLES_PART1[1..].iter() {
+        for &expected in &EXAMPLES_PART1[1..] {
             let was_updated = plan.update();
             assert!(was_updated);
             assert_eq!(plan.to_string(), expected);
@@ -461,7 +461,7 @@ LLL###LLL#
     #[test]
     fn test_update2() {
         let mut plan = EXAMPLES_PART2[0].parse::<SeatingPlan>().unwrap();
-        for &expected in EXAMPLES_PART2[1..].iter() {
+        for &expected in &EXAMPLES_PART2[1..] {
             let was_updated = plan.update2();
             assert!(was_updated);
             assert_eq!(plan.to_string(), expected);

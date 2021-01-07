@@ -9,44 +9,37 @@ use std::{
 };
 
 #[derive(Debug)]
-enum Day9Error {
-    NotFound,
-}
+struct NotFoundError {}
 
-impl fmt::Display for Day9Error {
+impl fmt::Display for NotFoundError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::NotFound => write!(f, "Not found"),
-        }
+        write!(f, "Not found")
     }
 }
 
-impl Error for Day9Error {}
+impl Error for NotFoundError {}
 
 fn find_pair<T>(numbers: &[T], target: T) -> Option<(T, T)>
 where
     T: Add<Output = T> + Copy + Ord,
 {
-    let mut numbers_fwd = numbers.iter();
-    let mut numbers_rev = numbers.iter().rev();
+    let mut it = numbers.iter();
 
-    let mut low = *numbers_fwd.next()?;
-    let mut high = *numbers_rev.next()?;
+    let mut low = *it.next()?;
+    let mut high = *it.next_back()?;
 
-    for _ in 0..numbers.len() - 1 {
+    loop {
         let total = low + high;
         match total.cmp(&target) {
             Ordering::Equal => return Some((low, high)),
             Ordering::Less => {
-                low = *numbers_fwd.next()?;
+                low = *it.next()?;
             }
             Ordering::Greater => {
-                high = *numbers_rev.next()?;
+                high = *it.next_back()?;
             }
         }
     }
-
-    None
 }
 
 fn find_incorrect<T>(sequence: &[T], preamble_size: usize) -> Option<T>
@@ -68,8 +61,8 @@ where
         .next()
 }
 
-fn part1(sequence: &[i64]) -> Result<i64, Day9Error> {
-    let result = find_incorrect(sequence, 25).ok_or(Day9Error::NotFound)?;
+fn part1(sequence: &[i64]) -> Result<i64, NotFoundError> {
+    let result = find_incorrect(sequence, 25).ok_or(NotFoundError {})?;
     println!("Part1: result = {}", result);
     Ok(result)
 }
@@ -80,18 +73,17 @@ where
 {
     let mut subsequence = sequence;
     while !subsequence.is_empty() {
-        let mut iterator = subsequence.iter().copied();
-        let mut sum = iterator.next().unwrap();
+        let mut sum = subsequence[0];
         let mut min_element = sum;
         let mut max_element = sum;
-        while sum < target {
-            if let Some(element) = iterator.next() {
-                sum += element;
-                min_element = std::cmp::min(min_element, element);
-                max_element = std::cmp::max(max_element, element);
-            } else {
+        for &element in &subsequence[1..] {
+            if sum >= target {
                 break;
             }
+
+            sum += element;
+            min_element = std::cmp::min(min_element, element);
+            max_element = std::cmp::max(max_element, element);
         }
 
         if sum == target {
@@ -104,8 +96,8 @@ where
     None
 }
 
-fn part2(sequence: &[i64], target: i64) -> Result<(), Day9Error> {
-    let result = find_contiguous(sequence, target).ok_or(Day9Error::NotFound)?;
+fn part2(sequence: &[i64], target: i64) -> Result<(), NotFoundError> {
+    let result = find_contiguous(sequence, target).ok_or(NotFoundError {})?;
     println!("Part 2: result = {}", result);
     Ok(())
 }
@@ -114,13 +106,12 @@ fn run() -> Result<(), Box<dyn Error>> {
     let source = {
         let path = ["data", "day09", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| {
-                l.map_err(Box::<dyn Error>::from)
-                    .and_then(|s| s.parse().map_err(Box::<dyn Error>::from))
-            })
-            .collect::<Result<Vec<_>, _>>()?
+        let mut source = Vec::new();
+        for line in BufReader::new(file).lines() {
+            source.push(line?.parse()?);
+        }
+
+        source
     };
     let target = part1(&source)?;
     part2(&source, target)?;

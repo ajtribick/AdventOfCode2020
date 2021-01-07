@@ -102,7 +102,7 @@ impl FoodProcessor {
             let allergens = parts.next().ok_or(ParseError("Missing allergens list"))?;
             let line_allergens = parse_allergens(allergens, &mut allergen_ids, &mut id_allergens);
 
-            for &allergen in line_allergens.iter() {
+            for allergen in line_allergens {
                 allergen_possibilities
                     .entry(allergen)
                     .and_modify(|value: &mut AHashSet<FoodId>| {
@@ -134,8 +134,8 @@ impl FoodProcessor {
     fn get_food_possibilities(&self) -> AHashMap<FoodId, AHashSet<AllergenId>> {
         let mut food_possibilities = AHashMap::with_capacity(self.id_foods.len());
 
-        for (allergen_id, food_ids) in self.allergen_possibilities.iter() {
-            for &food_id in food_ids.iter() {
+        for (allergen_id, food_ids) in &self.allergen_possibilities {
+            for &food_id in food_ids {
                 food_possibilities
                     .entry(food_id)
                     .and_modify(|s: &mut AHashSet<AllergenId>| {

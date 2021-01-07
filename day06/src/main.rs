@@ -9,44 +9,44 @@ use ahash::AHashSet;
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
     let mut current = AHashSet::new();
-    let result = lines.fold(0, |acc, l| match l.as_ref() {
-        "" => {
-            let group_len = current.len();
+    let mut question_sum = 0;
+    for line_ref in lines {
+        let line = line_ref.as_ref();
+        if line.is_empty() {
+            question_sum += current.len();
             current.clear();
-            acc + group_len
-        }
-        line => {
-            line.chars().for_each(|c| {
+        } else {
+            for c in line.chars() {
                 current.insert(c);
-            });
-            acc
+            }
         }
-    });
-    result + current.len()
+    }
+
+    question_sum + current.len()
 }
 
 fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> usize {
     let mut current = AHashSet::new();
-    let result = lines
-        .fold((0, true), |(total, is_start), l| match l.as_ref() {
-            "" => {
-                let group_len = current.len();
-                current.clear();
-                (total + group_len, true)
+    let mut question_sum = 0;
+    let mut is_first = true;
+    for line_ref in lines {
+        let line = line_ref.as_ref();
+        if line.is_empty() {
+            question_sum += current.len();
+            current.clear();
+            is_first = true;
+        } else if is_first {
+            for c in line.chars() {
+                current.insert(c);
             }
-            line => {
-                if is_start {
-                    line.chars().for_each(|c| {
-                        current.insert(c);
-                    });
-                } else {
-                    current.retain(|&c| line.contains(c));
-                }
-                (total, false)
-            }
-        })
-        .0;
-    result + current.len()
+
+            is_first = false;
+        } else {
+            current.retain(|&c| line.contains(c));
+        }
+    }
+
+    question_sum + current.len()
 }
 
 fn run() -> Result<(), Box<dyn Error>> {
