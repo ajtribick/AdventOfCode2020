@@ -142,8 +142,8 @@ mod rule_parsing {
 }
 
 impl RuleMap {
-    fn try_add_rule(&mut self, line: impl AsRef<str>) -> Result<(), ParseError> {
-        let (id, parse_rule) = rule_parsing::rule(line.as_ref())
+    fn try_add_rule(&mut self, line: &str) -> Result<(), ParseError> {
+        let (id, parse_rule) = rule_parsing::rule(line)
             .finish()
             .map_err(|e| ParseError(e.to_string()))?
             .1;
@@ -175,7 +175,7 @@ fn read_file(path: impl AsRef<Path>) -> Result<(RuleMap, Vec<String>), Box<dyn E
             continue;
         }
         match state {
-            ReadState::Rules => rule_map.try_add_rule(line)?,
+            ReadState::Rules => rule_map.try_add_rule(&line)?,
             ReadState::Messages => messages.push(line),
         }
     }

@@ -23,7 +23,7 @@ impl Error for ParseCoordsError {}
 struct Coords(i32, i32);
 
 impl Coords {
-    pub fn parse_line(line: impl AsRef<str>) -> Result<Self, ParseCoordsError> {
+    pub fn parse_line(line: &str) -> Result<Self, ParseCoordsError> {
         enum ParseState {
             None,
             North,
@@ -34,7 +34,7 @@ impl Coords {
         let mut x = 0;
         let mut y = 0;
 
-        for c in line.as_ref().bytes() {
+        for c in line.bytes() {
             match (&state, c) {
                 (ParseState::None, b'w') => x -= 1,
                 (ParseState::None, b'e') => x += 1,
@@ -122,7 +122,7 @@ impl Floor {
             }
         }
 
-        for coordinates in white_tile_check.drain() {
+        for coordinates in white_tile_check {
             if coordinates
                 .get_neighbors()
                 .iter()

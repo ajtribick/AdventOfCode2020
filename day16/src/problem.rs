@@ -128,9 +128,9 @@ impl Problem {
         parse_line(&mut lines, "nearby tickets:", "Missing nearby tickets")?;
         let mut ticket_data = Vec::new();
         for line_ref in lines {
-            parse_ticket(line_ref.as_ref(), field_count)?
-                .drain(..)
-                .for_each(|v| ticket_data.push(v));
+            for v in parse_ticket(line_ref.as_ref(), field_count)? {
+                ticket_data.push(v);
+            }
         }
 
         Ok(Self {

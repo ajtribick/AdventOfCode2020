@@ -23,8 +23,8 @@ impl fmt::Display for Day5Error {
 
 impl Error for Day5Error {}
 
-fn calculate_id(pass: impl AsRef<str>) -> i32 {
-    pass.as_ref().chars().fold(0, |acc, c| {
+fn calculate_id(pass: &str) -> i32 {
+    pass.chars().fold(0, |acc, c| {
         (acc << 1)
             + match c {
                 'B' | 'R' => 1,
@@ -34,13 +34,13 @@ fn calculate_id(pass: impl AsRef<str>) -> i32 {
 }
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
-    let max_value = lines.map(calculate_id).max().ok_or(Day5Error::NoData)?;
+    let max_value = lines.map(|l| calculate_id(l.as_ref())).max().ok_or(Day5Error::NoData)?;
     println!("Part 1: maximum ID = {}", max_value);
     Ok(())
 }
 
 fn part2(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
-    let mut ids = lines.map(calculate_id).collect::<Vec<_>>();
+    let mut ids = lines.map(|l| calculate_id(l.as_ref())).collect::<Vec<_>>();
     ids.sort_unstable();
     let pair = ids
         .windows(2)

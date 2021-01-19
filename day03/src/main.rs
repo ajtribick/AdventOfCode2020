@@ -30,10 +30,10 @@ fn part1(lines: impl Iterator<Item = impl AsRef<str>>) {
     println!("Part 1: encountered {} trees", trees);
 }
 
-fn part2(lines: &[impl AsRef<str>]) {
+fn part2(lines: impl Iterator<Item = impl AsRef<str>> + Clone) {
     let result = SLOPES
         .iter()
-        .map(|&(right_step, down_step)| count_trees(lines.iter(), right_step, down_step))
+        .map(|&(right_step, down_step)| count_trees(lines.clone(), right_step, down_step))
         .product::<u32>();
     println!("Part 2: product is {}", result);
 }
@@ -48,7 +48,7 @@ fn run() -> Result<(), io::Error> {
     };
 
     part1(lines.iter());
-    part2(&lines);
+    part2(lines.iter());
     Ok(())
 }
 
@@ -88,10 +88,11 @@ mod test {
 
     #[test]
     fn part2() {
+        let iter = EXAMPLE_LAYOUT.iter();
         let trees = SLOPES
             .iter()
             .map(|&(right_step, down_step)| {
-                count_trees(EXAMPLE_LAYOUT.iter(), right_step, down_step)
+                count_trees(iter.clone(), right_step, down_step)
             })
             .collect::<Vec<_>>();
 
