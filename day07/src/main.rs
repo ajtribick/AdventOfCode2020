@@ -7,10 +7,8 @@ use std::{
 
 use ahash::{AHashMap, AHashSet};
 
-mod day7error;
 mod rule;
 
-use day7error::Day7Error;
 use rule::Rule;
 
 const BAG_TYPE: &str = "shiny gold";
@@ -63,10 +61,11 @@ fn run() -> Result<(), Box<dyn Error>> {
     let rules = {
         let path = ["data", "day07", "input.txt"].iter().collect::<PathBuf>();
         let file = File::open(path)?;
-        BufReader::new(file)
-            .lines()
-            .map(|l| l.map_err(Day7Error::IoError).and_then(|s| s.parse()))
-            .collect::<Result<Vec<_>, _>>()?
+        let mut rules = Vec::new();
+        for line_result in BufReader::new(file).lines() {
+            rules.push(line_result?.parse()?);
+        }
+        rules
     };
 
     println!("Part 1: {} valid bags", part1(&rules));

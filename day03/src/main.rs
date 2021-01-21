@@ -91,9 +91,7 @@ mod test {
         let iter = EXAMPLE_LAYOUT.iter();
         let trees = SLOPES
             .iter()
-            .map(|&(right_step, down_step)| {
-                count_trees(iter.clone(), right_step, down_step)
-            })
+            .map(|&(right_step, down_step)| count_trees(iter.clone(), right_step, down_step))
             .collect::<Vec<_>>();
 
         let expected = [2, 7, 3, 4, 2];

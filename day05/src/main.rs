@@ -34,7 +34,10 @@ fn calculate_id(pass: &str) -> i32 {
 }
 
 fn part1(lines: impl Iterator<Item = impl AsRef<str>>) -> Result<(), Day5Error> {
-    let max_value = lines.map(|l| calculate_id(l.as_ref())).max().ok_or(Day5Error::NoData)?;
+    let max_value = lines
+        .map(|l| calculate_id(l.as_ref()))
+        .max()
+        .ok_or(Day5Error::NoData)?;
     println!("Part 1: maximum ID = {}", max_value);
     Ok(())
 }

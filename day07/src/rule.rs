@@ -1,16 +1,15 @@
-use std::str::FromStr;
+use std::{error, fmt, str::FromStr};
 
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::{alpha1, char, digit1},
-    combinator::{map, map_res, opt, recognize},
-    multi::separated_list1,
-    sequence::{separated_pair, terminated, tuple},
-    IResult,
-};
+#[derive(Debug)]
+pub struct ParseRuleError {}
 
-use crate::day7error::Day7Error;
+impl fmt::Display for ParseRuleError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Failed to parse rule")
+    }
+}
+
+impl error::Error for ParseRuleError {}
 
 #[derive(Debug, PartialEq)]
 pub struct Rule {
@@ -28,43 +27,57 @@ impl Rule {
     }
 }
 
-fn color(input: &str) -> IResult<&str, String> {
-    map(
-        recognize(separated_pair(alpha1, char(' '), alpha1)),
-        str::to_owned,
-    )(input)
-}
+mod parse {
+    use super::Rule;
 
-fn bag_list_entry(input: &str) -> IResult<&str, (i32, String)> {
-    terminated(
-        separated_pair(map_res(digit1, str::parse), char(' '), color),
-        tuple((tag(" bag"), opt(char('s')))),
-    )(input)
-}
+    use nom::{
+        branch::alt,
+        bytes::complete::tag,
+        character::complete::{alpha1, char, digit1},
+        combinator::{map, map_res, opt, recognize},
+        multi::separated_list1,
+        sequence::{separated_pair, terminated, tuple},
+        IResult,
+    };
 
-fn bag_list(input: &str) -> IResult<&str, Vec<(i32, String)>> {
-    separated_list1(tag(", "), bag_list_entry)(input)
-}
+    fn color(input: &str) -> IResult<&str, String> {
+        map(
+            recognize(separated_pair(alpha1, char(' '), alpha1)),
+            str::to_owned,
+        )(input)
+    }
 
-fn no_bags(input: &str) -> IResult<&str, Vec<(i32, String)>> {
-    map(tag("no other bags"), |_| Vec::new())(input)
-}
-
-fn rule(input: &str) -> IResult<&str, Rule> {
-    map(
+    fn bag_list_entry(input: &str) -> IResult<&str, (i32, String)> {
         terminated(
-            separated_pair(color, tag(" bags contain "), alt((no_bags, bag_list))),
-            char('.'),
-        ),
-        |(color, bag_list)| Rule { color, bag_list },
-    )(input)
+            separated_pair(map_res(digit1, str::parse), char(' '), color),
+            tuple((tag(" bag"), opt(char('s')))),
+        )(input)
+    }
+
+    fn bag_list(input: &str) -> IResult<&str, Vec<(i32, String)>> {
+        separated_list1(tag(", "), bag_list_entry)(input)
+    }
+
+    fn no_bags(input: &str) -> IResult<&str, Vec<(i32, String)>> {
+        map(tag("no other bags"), |_| Vec::new())(input)
+    }
+
+    pub fn rule(input: &str) -> IResult<&str, Rule> {
+        map(
+            terminated(
+                separated_pair(color, tag(" bags contain "), alt((no_bags, bag_list))),
+                char('.'),
+            ),
+            |(color, bag_list)| Rule { color, bag_list },
+        )(input)
+    }
 }
 
 impl FromStr for Rule {
-    type Err = Day7Error;
+    type Err = ParseRuleError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        rule(s).map_or(Err(Day7Error::ParseError), |(_, r)| Ok(r))
+        parse::rule(s).map_or(Err(ParseRuleError {}), |(_, r)| Ok(r))
     }
 }
 

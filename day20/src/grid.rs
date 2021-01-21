@@ -15,12 +15,25 @@ impl fmt::Display for ParseGridError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::GridError(s) => write!(f, "Grid error: {}", s),
-            Self::TileError(e) => write!(f, "{}", e),
+            Self::TileError(_) => write!(f, "Parse error"),
         }
     }
 }
 
-impl Error for ParseGridError {}
+impl Error for ParseGridError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::GridError(_) => None,
+            Self::TileError(e) => Some(e),
+        }
+    }
+}
+
+impl From<ParseTileError> for ParseGridError {
+    fn from(err: ParseTileError) -> Self {
+        Self::TileError(err)
+    }
+}
 
 fn find_corner(parsed_tiles: &mut [Tile]) -> Option<usize> {
     let (corner, edges1, edges2) = parsed_tiles.iter().enumerate().find_map(|(idx, tile)| {
@@ -98,7 +111,7 @@ impl Grid {
         S: AsRef<str>,
         I: Iterator<Item = S>,
     {
-        let mut parsed_tiles = parse_tiles(lines).map_err(ParseGridError::TileError)?;
+        let mut parsed_tiles = parse_tiles(lines)?;
         let size =
             sqrt_exact(parsed_tiles.len()).ok_or(ParseGridError::GridError("Non-square grid"))?;
 
